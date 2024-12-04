@@ -16,23 +16,22 @@ from azure.communication.callautomation import (
     FileSource,
     TextSource)
 import json
+from aiohttp import web
 import requests
 
 class OutboundCall:
-    target_number: str
     source_number: str
     acs_connection_string: str
     acs_callback_path: str
 
-    def __init__(self, target_number: str, source_number:str, acs_connection_string: str, acs_callback_path: str):
-        self.target_number = target_number
+    def __init__(self, source_number:str, acs_connection_string: str, acs_callback_path: str):
         self.source_number = source_number
         self.acs_connection_string = acs_connection_string
         self.acs_callback_path = acs_callback_path
     
-    async def call(self):
+    async def call(self, target_number: str):
         self.call_automation_client = CallAutomationClient.from_connection_string(self.acs_connection_string)
-        self.target_participant = PhoneNumberIdentifier(self.target_number)
+        self.target_participant = PhoneNumberIdentifier(target_number)
         self.source_caller = PhoneNumberIdentifier(self.source_number)
         call_connection_properties = self.call_automation_client.create_call(self.target_participant, 
                                                                     self.acs_callback_path,
@@ -51,6 +50,8 @@ class OutboundCall:
             if event.type == "Microsoft.Communication.CallConnected":
                 print("Call connected")
                 print(call_connection_id)
+
+        return web.Response(status=200)
 
 
     def attach_to_app(self, app, path):

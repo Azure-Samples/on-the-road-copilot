@@ -53,12 +53,10 @@ async def create_app():
 
     rtmt = RTMiddleTier(llm_endpoint, llm_deployment, llm_credential)
 
-    if (os.environ.get("ACS_TARGET_NUMBER") is not None and
-            os.environ.get("ACS_SOURCE_NUMBER") is not None and
+    if (os.environ.get("ACS_SOURCE_NUMBER") is not None and
             os.environ.get("ACS_CONNECTION_STRING") is not None and
             os.environ.get("ACS_CALLBACK_PATH") is not None):
         caller = OutboundCall(
-            os.environ.get("ACS_TARGET_NUMBER"),
             os.environ.get("ACS_SOURCE_NUMBER"),
             os.environ.get("ACS_CONNECTION_STRING"),
             os.environ.get("ACS_CALLBACK_PATH"),
@@ -117,8 +115,10 @@ async def create_app():
         return web.FileResponse(static_directory / 'index.html')
 
     async def call(request):
+        body = await request.json()
+
         if (caller is not None):
-            await caller.call()
+            await caller.call(body['number'])
             return web.Response(text="Created outbound call")
         else:
             return web.Response(text="Outbound calling is not configured")
