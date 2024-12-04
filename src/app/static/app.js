@@ -139,18 +139,16 @@ function onToggleListening() {
 
 function onCallButton() {
     const phonenumber = document.getElementById('phonenumber').value;
-
-    const callDetails = {
-        number: phonenumber
-    };
-
-
-    theUrl = window.location.href + "call";
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "POST", theUrl, false );
-    xmlHttp.send( callDetails );
     
-    reportDiv.textContent = xmlHttp.responseText;   
+    theUrl = window.location.href + "call";
+    fetch(theUrl, {
+        method : "POST",
+        body : JSON.stringify({
+            number: phonenumber
+        })
+    })
+    .then(response => reportDiv.textContent = response.json())
+    .catch(error => console.error('Error:', error));
 }
 
 toggleButton.addEventListener('click', onToggleListening);
