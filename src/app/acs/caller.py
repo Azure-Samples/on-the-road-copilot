@@ -48,7 +48,7 @@ class OutboundCall:
         self.target_participant = PhoneNumberIdentifier(target_number)
         self.source_caller = PhoneNumberIdentifier(self.source_number)
 
-        websocket_url = 'wss://' + self.acs_callback_path + '/realtime'
+        websocket_url = 'wss://' + self.acs_callback_path + '/realtime-acs'
 
         media_streaming_options = MediaStreamingOptions(
                         transport_url=websocket_url,
