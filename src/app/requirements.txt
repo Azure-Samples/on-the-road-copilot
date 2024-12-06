@@ -2,7 +2,8 @@ aiohttp==3.11.0
 azure-identity==1.19.0
 azure-eventgrid==4.20.0
 azure.cosmos==4.7.0
-azure-communication-callautomation==1.2.0
+azure-communication-callautomation==1.4.0b1
+azure-communication-phonenumbers==1.1.0
 gunicorn==23.0.0
 openai==1.54.4
 python-dotenv==1.0.1

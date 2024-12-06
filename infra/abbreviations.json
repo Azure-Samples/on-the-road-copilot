@@ -1,6 +1,7 @@
 {
     "analysisServicesServers": "as",
     "apiManagementService": "apim-",
+    "communicationService": "acs-",
     "appConfigurationConfigurationStores": "appcs-",
     "appManagedEnvironments": "cae-",
     "appContainerApps": "ca-",

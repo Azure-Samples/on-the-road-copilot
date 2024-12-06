@@ -10,6 +10,8 @@ param serviceName string = 'web'
 param imageName string
 param openaiName string
 param databaseAccountName string
+param acsconnectionName string = ''
+param acssourceNumber string = ''
 
 resource userIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: identityName
@@ -80,6 +82,18 @@ resource app 'Microsoft.App/containerApps@2023-04-01-preview' = {
             {
               name: 'COSMOSDB_DATABASE_NAME'
               value: 'mobile'
+            }
+            {
+              name: 'COSMOSDB_DATABASE_NAME'
+              value: 'mobile'
+            }            
+            {
+              name: 'ACS_CONNECTION_STRING'
+              value: acsconnectionName
+            }
+            {
+              name: 'ACS_SOURCE_NUMBER'
+              value: acssourceNumber
             }
           ]
           resources: {

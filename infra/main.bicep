@@ -18,7 +18,7 @@ param openaiName string = ''
 param cosmosDbAccountName string = ''
 param containerAppsEnvironmentName string = ''
 param containerRegistryName string = ''
-
+param communicationServiceName string = ''
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName, 'app': 'audio-agents', 'tracing': 'yes' }
@@ -115,6 +115,16 @@ module security 'core/security/security-main.bicep' = {
   }
 }
 
+module acs 'acs/acs.bicep' = {
+  name: 'acs'
+  scope: resourceGroup
+  params: {
+    name: !empty(communicationServiceName) ? communicationServiceName : '${abbrs.communicationService}${resourceToken}'
+    location: 'global'
+    tags: tags
+  }
+}
+
 output AZURE_LOCATION string = location
 output AZURE_AI_SERVICE_LOCATION string = openai.outputs.location
 output AZURE_TENANT_ID string = tenant().tenantId
@@ -132,3 +142,5 @@ output COSMOSDB_CONTAINER_NAME string = cosmosContainerName
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.applicationInsightsName
 output PRINCIPAL_ID string = principalId
+output ACS_CONNECTION_STRING string = acs.outputs.communicationConnectionString
+output ACS_CALLBACK_PATH string = 'localhost:8000'

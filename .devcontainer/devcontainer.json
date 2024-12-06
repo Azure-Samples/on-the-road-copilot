@@ -1,0 +1,64 @@
+{
+    "name": "Azure Developer CLI",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "VARIANT": "bullseye",
+            "VERSION": "3.12"
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/azure-cli:1": {
+            "version": "2.62.0"
+        },
+        "ghcr.io/devcontainers/features/docker-from-docker:1": {
+            "version": "20.10"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {
+            "version": "2"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.azure-dev",
+                "ms-azuretools.vscode-bicep",
+                "ms-azuretools.vscode-docker",
+                "ms-vscode.vscode-node-azure-pack",
+                "ms-vscode.js-debug",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "ms-azuretools.vscode-azurefunctions",
+                "github.vscode-github-actions",
+                "GitHub.copilot-nightly",
+                "ms-python.black-formatter"
+            ]
+        },
+        "codespaces": {
+            "openFiles": [
+                "main.py"
+            ]
+        }
+    },
+    "forwardPorts": [
+        4501,
+        8000,
+        8001,
+        8002
+    ],
+    "postAttachCommand": "",
+    "postCreateCommand": "pip3 install --user -r requirements.txt",
+    "remoteUser": "vscode",
+    "hostRequirements": {
+        "memory": "8gb",
+        "cpus": 4
+    },
+    "portsAttributes": {
+        "4501": {
+            "label": "Llama deploy"
+        },
+        "8000": {
+            "label": "Streamlit UI"
+        }
+    }
+}

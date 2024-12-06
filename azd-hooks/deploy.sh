@@ -11,6 +11,8 @@ fi
 
 AZURE_ENV_NAME="$2"
 
+SOURCENUMBER="$3"
+
 if [ "$AZURE_ENV_NAME" == "" ]; then
 echo "No environment name provided - aborting"
 exit 0;
@@ -69,7 +71,7 @@ ACA_NAME=roadcopilot$SERVICE_NAME
 
 URI=$(az deployment group create -g $RESOURCE_GROUP -f ./infra/core/app/web.bicep \
           -p name=$ACA_NAME -p location=$LOCATION -p containerAppsEnvironmentName=$ENVIRONMENT_NAME \
-          -p containerRegistryName=$AZURE_CONTAINER_REGISTRY_NAME -p applicationInsightsName=$APPINSIGHTS_NAME -p serviceName=$SERVICE_NAME \
+          -p containerRegistryName=$AZURE_CONTAINER_REGISTRY_NAME -p applicationInsightsName=$APPINSIGHTS_NAME -p serviceName=$SERVICE_NAME -p acssourceNumber=$SOURCENUMBER \
           -p openaiName=$OPENAI_NAME -p identityName=$IDENTITY_NAME -p imageName=$IMAGE_NAME -p databaseAccountName=$COSMOSDB_NAME --query properties.outputs.uri.value)
 
 echo "deployment uri: $URI"

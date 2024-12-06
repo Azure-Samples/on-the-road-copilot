@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 import time
-
+import json
 from aiohttp import web
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import AzureDeveloperCliCredential, DefaultAzureCredential
@@ -28,6 +28,8 @@ async def create_app():
     credential = None
 
     cosmos: CosmosDBStore = None
+    caller: OutboundCall = None
+    
     if not llm_key:
         if tenant_id := os.environ.get("AZURE_TENANT_ID"):
             logger.info(
@@ -53,15 +55,18 @@ async def create_app():
 
     rtmt = RTMiddleTier(llm_endpoint, llm_deployment, llm_credential)
 
-    if (os.environ.get("ACS_SOURCE_NUMBER") is not None and
-            os.environ.get("ACS_CONNECTION_STRING") is not None and
-            os.environ.get("ACS_CALLBACK_PATH") is not None and
-            os.environ.get("ACS_MEDIA_STREAMING_WEBSOCKET_PATH") is not None):
+    if (os.environ.get("ACS_CONNECTION_STRING") is not None and 
+        os.environ.get("ACS_SOURCE_NUMBER") is not None):
+        
+        callback_path = os.environ.get("ACS_CALLBACK_PATH")
+
+        if (os.environ.get("ACS_CALLBACK_PATH") is None):
+            callback_path = os.environ.get("CONTAINER_APP_HOSTNAME")
+
         caller = OutboundCall(
-            os.environ.get("ACS_SOURCE_NUMBER"),
             os.environ.get("ACS_CONNECTION_STRING"),
-            os.environ.get("ACS_CALLBACK_PATH"),
-            os.environ.get("ACS_MEDIA_STREAMING_WEBSOCKET_PATH")
+            os.environ.get("ACS_SOURCE_NUMBER"),
+            callback_path
         )
         caller.attach_to_app(app, "/acs")
 
@@ -120,14 +125,35 @@ async def create_app():
         body = await request.json()
 
         if (caller is not None):
-            await caller.call(body['number'])
-            return web.Response(text="Created outbound call")
+            body = await request.json()
+            print(body)
+            target_number = body['target_number']
+            return await caller.call(target_number)
         else:
             return web.Response(text="Outbound calling is not configured")
+
+    async def acs_status(request):
+
+        acs_status = {
+            'status' : 'ACS is not configured',
+            'outbound_calling_enabled': False,
+            'inbound_calling_enabled': False
+        }
+
+        if (caller is not None):
+            source_number = await caller._get_source_number()
+            if (source_number != ''):
+                acs_status['status'] = "ACS enabled with number " + source_number    
+                acs_status['outbound_calling_enabled'] = True
+                acs_status['inbound_calling_enabled'] = False
+                acs_status['source_number'] = source_number        
+        
+        return web.json_response(acs_status)
 
     app.router.add_get('/', index)
     app.router.add_static('/static/', path=str(static_directory), name='static')
     app.router.add_post('/call', call)
+    app.router.add_get('/status', acs_status)
 
     return app
 

@@ -11,11 +11,13 @@ resource roleDefinition 'Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinition
     ]
     permissions: [
       {
+        actions: [
+          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/write'
+        ]
         dataActions: [
           'Microsoft.DocumentDB/databaseAccounts/readMetadata'
           'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*'
           'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*'
-          'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/write'
         ]
         notDataActions: []
       }
