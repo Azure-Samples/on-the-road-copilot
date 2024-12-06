@@ -20,13 +20,8 @@ from azure.communication.callautomation import (
     DtmfTone,
     VoiceKind,
     FileSource,
-    TextSource,
-    MediaStreamingOptions,
-    AudioFormat,
-    MediaStreamingTransportType,
-    MediaStreamingContentType,
-    MediaStreamingAudioChannelType,
-    PhoneNumberIdentifier)
+    TextSource
+)
 from azure.communication.callautomation.aio import CallAutomationClient
 from azure.communication.phonenumbers import PhoneNumbersClient,PhoneNumberCapabilityType, PhoneNumberAssignmentType, PhoneNumberType, PhoneNumberCapabilities
 import json
