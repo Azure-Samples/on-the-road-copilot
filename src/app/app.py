@@ -55,11 +55,13 @@ async def create_app():
 
     if (os.environ.get("ACS_SOURCE_NUMBER") is not None and
             os.environ.get("ACS_CONNECTION_STRING") is not None and
-            os.environ.get("ACS_CALLBACK_PATH") is not None):
+            os.environ.get("ACS_CALLBACK_PATH") is not None and
+            os.environ.get("ACS_MEDIA_STREAMING_WEBSOCKET_PATH") is not None):
         caller = OutboundCall(
             os.environ.get("ACS_SOURCE_NUMBER"),
             os.environ.get("ACS_CONNECTION_STRING"),
             os.environ.get("ACS_CALLBACK_PATH"),
+            os.environ.get("ACS_MEDIA_STREAMING_WEBSOCKET_PATH")
         )
         caller.attach_to_app(app, "/acs")
 
