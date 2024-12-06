@@ -5,36 +5,45 @@ from azure.eventgrid import EventGridEvent, SystemEventNames
 from azure.core.messaging import CloudEvent
 from typing import List, Optional, Union, TYPE_CHECKING
 from azure.communication.callautomation import (
-    PhoneNumberIdentifier)
-from azure.communication.callautomation.aio import CallAutomationClient
-from azure.communication.callautomation import (
+    CallAutomationClient,
+    CallConnectionClient,
+    PhoneNumberIdentifier,
     MediaStreamingOptions,
-    AudioFormat,
     MediaStreamingTransportType,
     MediaStreamingContentType,
+    RecognizeInputType,
+    MicrosoftTeamsUserIdentifier,
     MediaStreamingAudioChannelType,
-    )
+    CallInvite,
+    RecognitionChoice,
+    AudioFormat,
+    DtmfTone,
+    VoiceKind,
+    FileSource,
+    TextSource
+)
+from azure.communication.callautomation.aio import CallAutomationClient
 from azure.communication.phonenumbers import PhoneNumbersClient,PhoneNumberCapabilityType, PhoneNumberAssignmentType, PhoneNumberType, PhoneNumberCapabilities
 import json
+from aiohttp import web
 import requests
 
 class OutboundCall:
-    target_number: str
     source_number: str
     acs_connection_string: str
     acs_callback_path: str
 
-    def __init__(self, acs_connection_string: str, acs_source_number: str, acs_callback_path: str):
+    def __init__(self, source_number:str, acs_connection_string: str, acs_callback_path: str):
+        self.source_number = source_number
         self.acs_connection_string = acs_connection_string
-        self.source_number = acs_source_number
-        self.acs_callback_path = acs_callback_path
-
+        self.acs_callback_path = acs_callback_path        
+    
     async def call(self, target_number: str):
         self.call_automation_client = CallAutomationClient.from_connection_string(self.acs_connection_string)
         self.target_participant = PhoneNumberIdentifier(target_number)
         self.source_caller = PhoneNumberIdentifier(self.source_number)
 
-        websocket_url = 'wss://' + self.acs_callback_path + '/realtime'
+        websocket_url = 'wss://' + self.acs_callback_path + '/realtime-acs'
 
         media_streaming_options = MediaStreamingOptions(
                         transport_url=websocket_url,
@@ -64,7 +73,7 @@ class OutboundCall:
             # Parsing callback events
             event = CloudEvent.from_dict(event_dict)
             call_connection_id = event.data['callConnectionId']
-            print("%s event received for call connection id: %s", event.type, call_connection_id)
+            print(f"{event.type} event received for call connection id: {call_connection_id}")
             call_connection_client = self.call_automation_client.get_call_connection(call_connection_id)
             # target_participant = PhoneNumberIdentifier(self.target_number)
             if event.type == "Microsoft.Communication.CallConnected":
@@ -80,7 +89,6 @@ class OutboundCall:
 
     async def _get_source_number(self):
        return self.source_number
-
 
     def attach_to_app(self, app, path):
         app.router.add_post(path, self._outbound_call_handler)

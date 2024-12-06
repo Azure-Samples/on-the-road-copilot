@@ -139,7 +139,6 @@ function onToggleListening() {
 
 function onCallButton() {
     const phonenumber = document.getElementById('phonenumber').value;
-
     const callDetails = {
         target_number: phonenumber
     };

@@ -122,6 +122,8 @@ async def create_app():
         return web.FileResponse(static_directory / 'index.html')
 
     async def call(request):
+        body = await request.json()
+
         if (caller is not None):
             body = await request.json()
             print(body)
