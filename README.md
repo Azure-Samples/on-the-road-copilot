@@ -1,4 +1,3 @@
-
 <h1 align="center">
   <br>
   <a href=""><img src="img/logo.jpeg" alt="logo" width="200"></a>
@@ -29,34 +28,78 @@ The app has minimal dependencies to allow for easy extension and integration wit
 ## Architecture
 
 ![architecture](img/architecture.png)
+
 ## How to set up the Azure environment
 
-To run this application, you can provision the resources using azure developer CLI.
+To run this application, you can provision the resources using Azure Developer CLI.
 
-From your command line:
+### Prerequisites
+
+1. Install the [Azure Developer CLI](https://aka.ms/azure-dev-cli)
+2. Install [Docker](https://docs.docker.com/get-docker/)
+3. Install [Python 3.8+](https://www.python.org/downloads/)
+
+### Steps
+
+1. **Login to Azure Developer CLI**
+
+    ```bash
+    azd auth login
+    ```
+
+2. **Provision the resources**
+
+    ```bash
+    azd up
+    ```
+
+    During this step, you will be prompted to provide values for `location` and `aiResourceLocation`. The following values should work:
+
+    - `location=northeurope`
+    - `aiResourceLocation=swedencentral`
+
+3. **Get and set the value for `AZURE_ENV_NAME`**
+
+    ```bash
+    source <(azd env get-values | grep AZURE_ENV_NAME)
+    ```
+
+4. **Build and deploy the Streamlit user interface**
+
+    ```bash
+    bash ./azd-hooks/deploy.sh app $AZURE_ENV_NAME
+    ```
+
+### Using the `azd-hooks/deploy.sh` script
+
+The `azd-hooks/deploy.sh` script is used for deploying the application. It takes two arguments:
+
+1. `SERVICE_NAME`: The name of the service to deploy.
+2. `AZURE_ENV_NAME`: The name of the Azure environment.
+
+Example usage:
 
 ```bash
-echo "log into azure dev cli - only once"
-azd auth login
-
-echo "provisioning all the resources with the azure dev cli"
-azd up
-
-# The following values should work:
-# location=northeurope
-# aiResourceLocation=swedencentral
-
-echo "get and set the value for AZURE_ENV_NAME"
-source <(azd env get-values | grep AZURE_ENV_NAME)
-
-echo "building and deploying the streamlit user interface"
 bash ./azd-hooks/deploy.sh app $AZURE_ENV_NAME
 ```
 
+### Configuration
+
+The `azure.yaml` file contains configuration details for the Azure environment. Ensure that the configuration in this file matches your requirements.
+
+### Environment Variables
+
+The following environment variables are required for deployment:
+
+- `AZURE_ENV_NAME`: The name of the Azure environment.
+- `AZURE_LOCATION`: The location of the Azure resources.
+- `AZURE_PRINCIPAL_ID`: The principal ID for Azure authentication.
+- `OPENAI_CAPACITY`: The capacity for the OpenAI service.
+
+Ensure these variables are set in your environment before deploying the application.
+
 > **Note**
-> If you do not provision a cosmosDB, you can still run the app using the local sample files. To replace the data source, substitute the cosmosdb module.
-
-
+> If you do not provision a CosmosDB, you can still run the app using the local sample files. To replace the data source, substitute the CosmosDB module.
 
 ## Contributors
 
@@ -68,9 +111,8 @@ bash ./azd-hooks/deploy.sh app $AZURE_ENV_NAME
 
 [voice RAG](https://github.com/Azure-Samples/aisearch-openai-rag-audio) - RAG + Voice Using Azure AI Search and the GPT-4o Realtime API for Audio
 
-
 ## Disclaimer
 
 This is an open-source repository and it does not have official support from Microsoft. Use at your own risk 😉
 
-For production scenarious, questions and bugs please open a Github issue.
+For production scenarios, questions and bugs please open a Github issue.
